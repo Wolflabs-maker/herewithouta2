@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOLFIFY | Here Without You Lab</title>
+    
+    <!-- LIBRARIES (Running directly in browser - NO INSTALL NEEDED) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@700;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .urbanist { font-family: 'Urbanist', sans-serif; }
+        
+        /* Glows de Ambiente */
+        .glow-spot {
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(29, 185, 84, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Animações */
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-slow { animation: pulse-slow 3s infinite; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #1DB954; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- ICON SYSTEM ---
+        const Icon = ({ name, size = 24, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]); 
+            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+        };
+
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('home');
+
+            return (
+                <div className="flex h-screen w-full bg-[#050505] text-white">
+                    {/* SIDEBAR */}
+                    <aside className="w-20 bg-black border-r border-white/10 flex flex-col items-center py-8 gap-8 z-50 shadow-2xl">
+                        <div className="text-3xl font-black text-green-500 tracking-tighter mb-4">W</div>
+                        <NavButton icon="home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+                        <NavButton icon="book" active={activeTab === 'theory'} onClick={() => setActiveTab('theory')} />
+                        <NavButton icon="zap" active={activeTab === 'drills'} onClick={() => setActiveTab('drills')} />
+                        <NavButton icon="mic" active={activeTab === 'speaking'} onClick={() => setActiveTab('speaking')} />
+                        <NavButton icon="music" active={activeTab === 'lyrics'} onClick={() => setActiveTab('lyrics')} />
+                    </aside>
+
+                    {/* MAIN CONTENT AREA */}
+                    <main className="flex-1 relative overflow-y-auto">
+                        <div className="glow-spot top-[-200px] right-[-200px]"></div>
+                        <div className="glow-spot bottom-[-200px] left-[-200px]"></div>
+
+                        <div className="p-8 md:p-12 max-w-6xl mx-auto z-10 relative h-full">
+                            {activeTab === 'home' && <HomeView setTab={setActiveTab} />}
+                            {activeTab === 'theory' && <TheoryView setTab={setActiveTab} />}
+                            {activeTab === 'drills' && <DrillsView />}
+                            {activeTab === 'speaking' && <SpeakingView />}
+                            {activeTab === 'lyrics' && <LyricsView />}
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        // --- COMPONENTS ---
+
+        const NavButton = ({ icon, active, onClick }) => (
+            <button 
+                onClick={onClick}
+                className={`p-3 rounded-xl transition-all duration-300 ${active ? 'bg-green-600 text-white shadow-[0_0_20px_rgba(22,163,74,0.4)] scale-110' : 'text-gray-500 hover:text-white hover:bg-white/10'}`}
+            >
+                <Icon name={icon} size={24} />
+            </button>
+        );
+
+        const HomeView = ({ setTab }) => (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <header className="flex flex-col md:flex-row items-end gap-8 mb-16 border-b border-white/10 pb-12">
+                    <div className="w-64 h-64 bg-gradient-to-br from-green-900 to-black rounded-3xl shadow-2xl flex items-center justify-center border border-white/10 group relative overflow-hidden">
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <Icon name="headphones" size={80} className="text-green-500 group-hover:scale-110 transition-transform duration-500 drop-shadow-2xl" />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-xs font-black tracking-widest uppercase border border-green-500/20">LEVEL A2</span>
+                            <span className="text-gray-500 text-xs font-bold tracking-widest uppercase">Post-Grunge</span>
+                        </div>
+                        <h1 className="text-7xl font-black urbanist leading-none mb-4 uppercase text-white">Here Without<br/><span className="text-green-500">You</span></h1>
+                        <p className="text-gray-400 text-lg font-medium">3 Doors Down • Emotional Resilience Lab</p>
+                    </div>
+                </header>
+
+                <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-white"><Icon name="layers" size={20} className="text-green-500"/> Learning Path</h3>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <Card 
+                        title="1. Grammar Map" 
+                        desc="Understand the Timeline: Habits vs. Now." 
+                        icon="book" 
+                        onClick={() => setTab('theory')} 
+                    />
+                    <Card 
+                        title="2. Time Drills" 
+                        desc="Challenge: Identify the correct tense." 
+                        icon="zap" 
+                        onClick={() => setTab('drills')} 
+                    />
+                    <Card 
+                        title="3. Conversation" 
+                        desc="Podcast Booth: Talk about long distance." 
+                        icon="mic" 
+                        onClick={() => setTab('speaking')} 
+                    />
+                    <Card 
+                        title="4. Lyrics Lab" 
+                        desc="Reconstruct the song structure." 
+                        icon="music" 
+                        onClick={() => setTab('lyrics')} 
+                    />
+                </div>
+            </div>
+        );
+
+        const Card = ({ title, desc, icon, onClick }) => (
+            <div onClick={onClick} className="bg-[#111] p-8 rounded-2xl border border-white/5 hover:border-green-500/50 hover:-translate-y-2 transition-all cursor-pointer group shadow-lg hover:shadow-green-900/10">
+                <div className="mb-6 p-4 bg-white/5 rounded-full w-fit group-hover:bg-green-500/20 group-hover:text-green-500 transition-colors">
+                    <Icon name={icon} size={28} />
+                </div>
+                <h3 className="text-xl font-bold mb-2 urbanist uppercase text-white">{title}</h3>
+                <p className="text-gray-500 text-xs leading-relaxed">{desc}</p>
+            </div>
+        );
+
+        // --- 1. THEORY SECTION ---
+        const TheoryView = ({ setTab }) => (
+            <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/30 text-green-500"><Icon name="book" size={24}/></div>
+                    <div>
+                        <h2 className="text-3xl font-black urbanist uppercase tracking-tight text-white">Grammar <span className="text-green-500">Map</span></h2>
+                        <p className="text-gray-400 text-sm font-bold tracking-widest uppercase">Simple Present vs. Continuous</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {/* Card Simple */}
+                    <div className="bg-[#111] p-8 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-colors shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                        <div className="flex items-center gap-3 mb-6">
+                            <Icon name="rotate-cw" className="text-blue-500" size={20}/>
+                            <h3 className="text-lg font-black uppercase tracking-widest text-white">Simple Present</h3>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="text-gray-400 text-sm leading-relaxed">
+                                Use for <b className="text-white">Habits, Routines</b> and <b className="text-white">Facts</b>. Things that are always true.
+                            </div>
+                            <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl">
+                                <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Example</div>
+                                <div className="text-lg font-bold text-white">"I <span className="text-blue-400">DREAM</span> every night."</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Card Continuous */}
+                    <div className="bg-[#111] p-8 rounded-3xl border border-white/5 hover:border-green-500/30 transition-colors shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+                        <div className="flex items-center gap-3 mb-6">
+                            <Icon name="play-circle" className="text-green-500" size={20}/>
+                            <h3 className="text-lg font-black uppercase tracking-widest text-white">Present Continuous</h3>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="text-gray-400 text-sm leading-relaxed">
+                                Use for actions happening <b className="text-white">Right Now</b> or temporary situations.
+                            </div>
+                            <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-xl">
+                                <div className="text-[10px] font-black text-green-400 uppercase tracking-widest mb-1">Example</div>
+                                <div className="text-lg font-bold text-white">"I <span className="text-green-400">AM THINKING</span> about you."</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="text-center">
+                    <button 
+                        onClick={() => setTab('drills')}
+                        className="group bg-white text-black px-10 py-4 rounded-full font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)] flex items-center gap-3 mx-auto"
+                    >
+                        Start Drilling <Icon name="arrow-right" size={18} className="group-hover:translate-x-1 transition-transform"/>
+                    </button>
+                </div>
+            </div>
+        );
+
+        // --- 2. DRILLING SECTION ---
+        const DrillsView = () => {
+            const [score, setScore] = useState(0);
+            const [qIndex, setQIndex] = useState(0);
+            const [feedback, setFeedback] = useState(null);
+
+            const questions = [
+                { id: 1, text: "I _______ about you right now.", options: ["think", "am thinking"], answer: "am thinking", type: "Continuous (Keyword: Right Now)" },
+                { id: 2, text: "I _______ about you every night.", options: ["dream", "am dreaming"], answer: "dream", type: "Simple (Keyword: Every Night)" },
+                { id: 3, text: "I _______ here without you, baby.", options: ["am", "be"], answer: "am", type: "State Verb (Fact)" },
+                { id: 4, text: "The miles _______ getting longer.", options: ["keep", "are keeping"], answer: "keep", type: "Simple (Fact)" },
+                { id: 5, text: "Look! He _______ on the stage.", options: ["stands", "is standing"], answer: "is standing", type: "Continuous (Action Now)" },
+                { id: 6, text: "And I _______ you (love).", options: ["am loving", "love"], answer: "love", type: "Stative Verb (Love/Hate/Know)" }
+            ];
+
+            const handleAnswer = (option) => {
+                if (feedback) return;
+                if (option === questions[qIndex].answer) {
+                    setFeedback("correct");
+                    setScore(s => s + 1);
+                } else {
+                    setFeedback("wrong");
+                }
+            };
+
+            const nextQ = () => {
+                if (qIndex < questions.length - 1) {
+                    setQIndex(prev => prev + 1);
+                    setFeedback(null);
+                } else {
+                    setFeedback("finished");
+                }
+            };
+
+            return (
+                <div className="max-w-2xl mx-auto py-10 animate-in fade-in slide-in-from-right-4">
+                    <h2 className="text-4xl font-black urbanist mb-2 uppercase text-white">Timeline <span className="text-green-500">Drills</span></h2>
+                    <p className="text-gray-400 mb-10 text-lg">Decide: <b>Routine</b> or <b>Action Now</b>?</p>
+
+                    {feedback !== "finished" ? (
+                        <div className="bg-[#111] border border-white/10 p-10 rounded-3xl relative overflow-hidden shadow-2xl">
+                            <div className="flex justify-between text-xs font-bold text-gray-500 uppercase tracking-widest mb-8">
+                                <span>Question {qIndex + 1} / {questions.length}</span>
+                                <span>Score: {score}</span>
+                            </div>
+
+                            <div className="text-3xl font-bold mb-12 leading-relaxed text-white">
+                                {questions[qIndex].text.split("_______").map((part, i) => (
+                                    <span key={i}>
+                                        {part}
+                                        {i === 0 && <span className="inline-block w-32 border-b-4 border-green-500 mx-2 animate-pulse"></span>}
+                                    </span>
+                                ))}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                {questions[qIndex].options.map((opt, i) => (
+                                    <button 
+                                        key={i}
+                                        onClick={() => handleAnswer(opt)}
+                                        className={`py-5 rounded-xl font-bold uppercase tracking-widest border-2 transition-all text-sm
+                                            ${feedback === null ? 'border-white/10 hover:border-green-500 hover:bg-green-500/10 text-gray-300' : ''}
+                                            ${feedback === 'correct' && opt === questions[qIndex].answer ? 'bg-green-600 border-green-500 text-white' : ''}
+                                            ${feedback === 'wrong' && opt !== questions[qIndex].answer ? 'opacity-50 border-red-500 text-red-500' : ''}
+                                            ${feedback && opt !== questions[qIndex].answer && feedback !== 'wrong' ? 'opacity-30 border-white/5' : ''}
+                                        `}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {feedback && (
+                                <div className="mt-8 pt-6 border-t border-white/10 flex justify-between items-center animate-in fade-in slide-in-from-bottom-2">
+                                    <div className={`text-sm font-bold uppercase tracking-wide ${feedback === 'correct' ? 'text-green-500' : 'text-red-500'}`}>
+                                        {feedback === 'correct' ? `Correct! Rule: ${questions[qIndex].type}` : `Incorrect. Rule: ${questions[qIndex].type}`}
+                                    </div>
+                                    <button onClick={nextQ} className="bg-white text-black px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2">
+                                        Next <Icon name="arrow-right" size={16} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="text-center p-12 bg-green-500/10 rounded-3xl border border-green-500/30 animate-in zoom-in-95">
+                            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-black">
+                                <Icon name="check-circle-2" size={40} />
+                            </div>
+                            <h3 className="text-3xl font-black mb-4 text-white uppercase">Module Complete!</h3>
+                            <p className="text-xl text-gray-300">Your Score: {score} / {questions.length}</p>
+                            <button onClick={() => {setQIndex(0); setFeedback(null); setScore(0);}} className="mt-8 bg-green-500 text-black px-10 py-4 rounded-full font-black uppercase tracking-widest hover:scale-105 transition-transform">Restart Module</button>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- 3. CONVERSATION SECTION ---
+        const SpeakingView = () => {
+            const [topic, setTopic] = useState("Press 'Generate Topic'");
+            const [isLoading, setIsLoading] = useState(false);
+            
+            const topics = [
+                "Is it possible to love someone you rarely see? Why?",
+                "What is the hardest part about being away from home?",
+                "If you could dream about anything tonight, what would it be?",
+                "Do you believe long-distance relationships can work?",
+                "Describe a person you miss right now. Use 'Still' and 'Lonely'."
+            ];
+
+            const generate = () => {
+                setIsLoading(true);
+                setTopic("Thinking...");
+                setTimeout(() => {
+                    const random = topics[Math.floor(Math.random() * topics.length)];
+                    setTopic(random);
+                    setIsLoading(false);
+                }, 600);
+            };
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[60vh] text-center max-w-4xl mx-auto">
+                    <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(220,38,38,0.4)] animate-pulse-slow text-white">
+                        <Icon name="mic" size={40} />
+                    </div>
+                    
+                    <h2 className="text-xs font-black text-red-500 tracking-[0.5em] uppercase mb-6">Podcast Mode • On Air</h2>
+                    
+                    <div className={`text-4xl md:text-5xl font-black urbanist leading-tight mb-12 min-h-[150px] flex items-center justify-center transition-all duration-500 ${isLoading ? 'opacity-50 blur-sm' : 'opacity-100'}`}>
+                        "{topic}"
+                    </div>
+
+                    <button 
+                        onClick={generate}
+                        className="group relative px-10 py-4 bg-white text-black font-black uppercase tracking-widest rounded-full overflow-hidden hover:scale-105 transition-transform shadow-xl"
+                    >
+                        <span className="relative z-10 flex items-center gap-3"><Icon name="refresh-cw" size={18}/> New Topic</span>
+                        <div className="absolute inset-0 bg-green-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    </button>
+                    
+                    <div className="mt-16 p-8 bg-[#111] rounded-2xl border border-white/5 w-full text-left">
+                        <span className="text-xs text-gray-500 font-bold uppercase tracking-widest block mb-4">Keywords to Use:</span>
+                        <div className="flex flex-wrap gap-3">
+                            <span className="px-4 py-2 bg-white/5 rounded-lg text-xs font-bold text-green-400 border border-white/5">Lonely</span>
+                            <span className="px-4 py-2 bg-white/5 rounded-lg text-xs font-bold text-green-400 border border-white/5">Miles</span>
+                            <span className="px-4 py-2 bg-white/5 rounded-lg text-xs font-bold text-green-400 border border-white/5">Still</span>
+                            <span className="px-4 py-2 bg-white/5 rounded-lg text-xs font-bold text-green-400 border border-white/5">Dreaming</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 4. LYRICS SECTION ---
+        const LyricsView = () => {
+            const [order, setOrder] = useState([
+                { id: 'c', text: "I'm here without you, baby" },
+                { id: 'a', text: "A hundred days have made me older" },
+                { id: 'd', text: "But you're still on my lonely mind" },
+                { id: 'b', text: "Since the last time that I saw your pretty face" },
+            ]);
+            
+            const checkOrder = () => {
+                const currentIds = order.map(o => o.id).join('');
+                if (currentIds === 'abcd') alert("Perfect Harmony! You nailed the sequence.");
+                else alert("Not quite right. Listen to the beat and try again.");
+            };
+
+            const moveUp = (index) => {
+                if (index === 0) return;
+                const newOrder = [...order];
+                [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+                setOrder(newOrder);
+            };
+
+            return (
+                <div className="max-w-3xl mx-auto py-10">
+                    <h2 className="text-4xl font-black urbanist mb-4 uppercase text-white">Lyric <span className="text-blue-500">Deconstruction</span></h2>
+                    <p className="text-gray-400 mb-12 text-lg">Reorder the verses to match the song's opening.</p>
+
+                    <div className="space-y-4">
+                        {order.map((line, index) => (
+                            <div key={line.id} className="flex items-center gap-6 bg-[#111] p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all group shadow-md">
+                                <span className="text-4xl font-black text-gray-800 group-hover:text-green-500 transition-colors">0{index + 1}</span>
+                                <div className="flex-1 font-medium text-xl text-gray-200">{line.text}</div>
+                                <div className="flex flex-col gap-2">
+                                    <button onClick={() => moveUp(index)} className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors" disabled={index === 0}>
+                                        <Icon name="arrow-up" size={20}/>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <button onClick={checkOrder} className="mt-10 w-full py-5 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl hover:bg-blue-500 transition-colors shadow-lg flex items-center justify-center gap-3">
+                        <Icon name="play" size={18} fill="currentColor" /> Verify Sequence
+                    </button>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
